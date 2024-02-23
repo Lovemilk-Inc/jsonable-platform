@@ -8,7 +8,7 @@ stdout, _ = process.communicate()
 assert process.returncode == 0, f'poetry exited with non-zero return code (got {process.returncode})'
 
 
-version = tuple(map(int, stdout.decode().strip().split('.')))
+version = tuple(stdout.decode().strip().split('.'))
 
 
 if len(version) > 3:

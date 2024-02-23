@@ -1,5 +1,6 @@
 from unittest import TestCase
-from .jsonable_datetime import datetime
+from typing import Union
+
 from jsonable_platform import (
     dumps,
     register,
@@ -38,28 +39,28 @@ class ConvertTest(TestCase):
 
 
 class RecursionTest(JSONAbleABC):
-    def __init__(self, _datetime: datetime):
-        self.datetime = _datetime
+    def __init__(self, recursion_test: Union['RecursionTest', None] = None):
+        self.recursion_test = recursion_test
 
     @classmethod
     def __jsonable_encode__(cls, obj: Self) -> JSONAbleABCEncodedType:
-        return {'datetime': obj.datetime}
+        return {'recursion_test': obj.recursion_test}
 
     @classmethod
     def __jsonable_decode__(cls, data: JSONAbleABCEncodedType) -> Self:
-        return cls(data['datetime'])
+        return cls(data['recursion_test'])
 
     def __eq__(self, other):
-        return hasattr(other, 'datetime') and self.datetime == other.datetime
+        return hasattr(other, 'recursion_test') and self.recursion_test == other.recursion_test
 
 
 def test_recursion():
     register(RecursionTest)
 
-    test = RecursionTest(datetime(2024, 1, 1))
+    test = RecursionTest(RecursionTest(RecursionTest(None)))
 
     encoded = dumps({'test': test})
 
     decoded = loads(encoded)
 
-    assert decoded['test'] == test and isinstance(decoded['test'].datetime, datetime), 'recursion test failed'
+    assert decoded['test'] == test, 'recursion test failed'

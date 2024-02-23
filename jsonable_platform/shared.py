@@ -37,7 +37,7 @@ def class_name(obj_or_cls: Any, default: DefaultType = None) -> str | DefaultTyp
 
 
 def hash_class(cls: Any) -> tuple[str, HashMethods]:
-    res = False
+    res = None
     func = getattr(cls, '__jsonable_hash__', None)
     if callable(func):
         res = func()
