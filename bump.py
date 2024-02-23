@@ -21,5 +21,6 @@ assert code == 0, f'poetry exited with non-zero return code (got {code})'
 
 args = tuple(map(lambda s: s.lower(), sys.argv[1:]))
 if '--publish' in args:
+    print('publishing...')
     code = call(['poetry', 'publish', '--build'])
     assert code == 0, f'poetry exited with non-zero return code (got {code})'
