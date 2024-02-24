@@ -22,9 +22,6 @@ pip install jsonable-platform
   
   2. ### 编解码
      * 本模块类似于 Python 官方的 `json` 库, 您只需使用 `dump`, `dumps`, `load`, `loads` 即可使用
+     更为详细的使用文档, 请参阅 [jsonable-platform 使用方法](./USAGE.md)
      > 注意: dump(s) 的 default 参数和 load(s) 的 cls 参数不可用
-```python
-from jsonable_platform import dumps, loads, dump, load
 
-# 使用方法见 https://docs.python.org/zh-cn/3/library/json.html
-```

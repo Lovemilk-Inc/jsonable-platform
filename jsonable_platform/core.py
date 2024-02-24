@@ -6,7 +6,7 @@ if TYPE_CHECKING:
 from json import dumps as std_dumps, loads as std_loads, dump as std_dump, load as std_load
 from json.decoder import JSONDecoder
 
-from .type import JSONSupportedEditableIters
+from .type import JSONSupportedEditableIters, JSONSupportedTypes, EncoderFallbackType
 from .type import DefinedClasses, JSONAbleABC, JSONAbleEncodedDict
 from .shared import json_native_encode, class_name, hash_class, get_jsonable_keyname
 
@@ -60,29 +60,34 @@ def unregister(cls: type[JSONAbleABC]):
     _register_jsonable(cls, remove=True)
 
 
-def jsonable_encoder(obj: Any):
-    if json_native_encode(obj) is not None:
-        assert False, 'Cannot call jsonable_encoder on native jsonable objects'
+def jsonable_encoder(obj: Any, fallback: EncoderFallbackType = None):
+    if json_native_encode(obj):
+        return obj
 
     cls, hdx = _search_jsonable_by_object(obj)
     if cls is not None and hdx is not None:
         data = cls.__jsonable_encode__(obj)
         if isinstance(data, JSONSupportedEditableIters):
-            map(jsonable_encoder, data)
+            map(lambda _obj: jsonable_encoder(_obj, fallback), data)
 
         # { JSONABLE_PREFIX<class_name>: { 'data': data } }
         return {
-            f'{JSONABLE_PREFIX}{class_name(obj)}':
-                JSONAbleEncodedDict(hash=hdx, data=data)
+            f'{JSONABLE_PREFIX}{class_name(obj)}': JSONAbleEncodedDict(hash=hdx, data=data)
+        }
+
+    res = fallback(obj) if fallback is not None else None
+    if isinstance(res, JSONAbleEncodedDict):
+        return {
+            f'{JSONABLE_PREFIX}{class_name(obj)}': res
         }
 
     raise TypeError(f'Cannot convert {class_name(class_name(obj), "Unknown")} to JSON')
 
 
-def dumps(obj: Any, **kwargs):
+def dumps(obj: JSONSupportedTypes, fallback: EncoderFallbackType = None, **kwargs):
     kwargs.setdefault('ensure_ascii', False)
     kwargs.pop('default', None)
-    return std_dumps(obj, default=jsonable_encoder, **kwargs)
+    return std_dumps(obj, default=lambda _obj: jsonable_encoder(_obj, fallback), **kwargs)
 
 
 class JSONAbleDecoder(JSONDecoder):
@@ -121,10 +126,10 @@ def loads(s: str, **kwargs):
     return std_loads(s, cls=JSONAbleDecoder, **kwargs)
 
 
-def dump(obj: Any, fp: 'SupportsWrite[str]', **kwargs):
+def dump(obj: Any, fp: 'SupportsWrite[str]', fallback: EncoderFallbackType = None, **kwargs):
     kwargs.pop('default', None)
 
-    std_dump(obj, fp, default=jsonable_encoder, **kwargs)
+    std_dump(obj, fp, default=lambda _obj: jsonable_encoder(_obj, fallback), **kwargs)
 
 
 def load(fp: 'SupportsRead[str]', **kwargs):

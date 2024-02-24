@@ -10,7 +10,7 @@
 from datetime import datetime as std_datetime
 from jsonable_platform import JSONAbleABC, Self, JSONAbleABCEncodedType, register
   
-# 继承 JSONAbleABC 和原始的 datetime, `JSONAbleABC[<type>]` `type` 同时代表了 `__jsonable_encode__` 返回值 和 `__jsonable_decode__` 参数 `obj`
+# 继承 JSONAbleABC 和原始的 datetime, `JSONAbleABC[<type>]` `type` 同时代表了 `__jsonable_encode__` 返回值 和 `__jsonable_decode__` 参数 `obj` 的类型
 class datetime(std_datetime, JSONAbleABC[float]):
     # 实现类方法 __jsonable_encode__, 返回一个可转为 JSON 的 Python 基本类型 或 jsonable 类 实例化后的对象
     # 此处实际返回 float 
@@ -34,3 +34,4 @@ register(datetime)  # 将 datetime 注册到转换器中, 以便自动查找并�
 
   * ## 注册类
      * 使用 `register` 函数注册类, 后会根据类型匹配并自动调用 `__jsonable_encode__` 类方法
+     * 同样的, 您可以使用 `unregister` 取消注册类

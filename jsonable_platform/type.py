@@ -1,5 +1,5 @@
 from sys import version_info
-from typing import TypedDict, TypeAlias, TypeVar, Literal, Union, Generic
+from typing import TypedDict, TypeAlias, TypeVar, Literal, Union, Generic, Any, Callable
 
 JSONAbleClassID: TypeAlias = str
 
@@ -64,3 +64,4 @@ class JSONAbleEncodedDict(TypedDict):
 
 
 HashMethods = Literal['default', 'custom']
+EncoderFallbackType = Callable[[Any], JSONAbleEncodedDict]
