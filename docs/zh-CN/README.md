@@ -15,7 +15,7 @@ pip install jsonable-platform
 
 * ### 使用
   1. ### 定义类
-     * 作为 Python 初学者, 您可以安装其他作者编写的适用于本平台的 Pypi 包, 根据命名规则, 其包名应当以 `jsonable-platform-` 或 `jsonable_platfrom` 开头.
+     * 作为 Python 初学者, 您可以安装其他作者编写的适用于本平台的 Pypi 包, 根据命名规则, 其包名应当以 `jsonable-platform-` 或 `jsonable_platfrom_` 开头.
      选择合适的 Pypi 包 安装即可
   
      * 作为进阶用户, 您可以 [自定义 jsonable 类, 详情请参阅此处](./CUSTOM_CLASS.md)
