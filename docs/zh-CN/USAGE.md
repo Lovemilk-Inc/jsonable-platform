@@ -63,7 +63,7 @@
 
 * 返回: `None`
 
-### 函数: `jsonable_platform.jsonable_encoder`
+### 函数: `jsonable_platform.jsonable_encoder(obj, fallback=None)`
 * 编码任意 JSON 原生支持 或 继承与 `JSONAbleABC` 的符合 jsonable 标准的对象
 
 * 参数
@@ -74,7 +74,7 @@
 * 返回: 当传入原生 JSON 支持的 Python 对象 时, 直接返回该对象, 否则尝试使用 jsonable 编码, 返回字典如下结构: `{ '<JSONABLE_PREFIX><对象名称>': JSONAbleEncodedDict }` <br>
 其中, `JSONABLE_PREFIX` 为 `jsonable_platform.JSONABLE_PREFIX` 字符串常量
 
-### 类: `jsonable_platform.JSONAbleDecoder`
+### 类: `jsonable_platform.JSONAbleDecoder(*, object_hook=None, parse_float=None, parse_int=None, parse_constant=None, strict=True, object_pairs_hook=None)`
 * 继承于内置 `json.decoder.JSONDecoder`, 实现了 `decode` 方法
 
 * 参数: 与 内置 `json.decoder.JSONDecoder` 相同 (详情请参阅 [此处](https://docs.python.org/zh-cn/3.12/library/json.html#json.JSONDecoder))
