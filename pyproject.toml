@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "jsonable-platform"
-version = "0.0.1.20240224143523"
+version = "0.0.2.20240225175423"
 description = "Customizing convert to JSON from the objects you defined for Python 3+"
 authors = ["lovemilk <zhuhansan666@outlook.com>"]
 license = "BSD-3-Clause"
@@ -23,6 +23,7 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.9"
 typing_extensions = {version = "*", python = "< 3.11"}
+deprecated = "^1.2.14"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.1"

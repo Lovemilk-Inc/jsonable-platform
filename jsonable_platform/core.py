@@ -3,12 +3,14 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsWrite, SupportsRead
 
+from deprecated import deprecated
 from json import dumps as std_dumps, loads as std_loads, dump as std_dump, load as std_load
 from json.decoder import JSONDecoder
 
-from .type import JSONSupportedEditableIters, JSONSupportedTypes, EncoderFallbackType
+from .type import JSONSupportedEditableIters, JSONSupportedTypes, JSONSupportedBases
+from .type import EncoderFallbackType, DecoderFallbackType
 from .type import DefinedClasses, JSONAbleABC, JSONAbleEncodedDict
-from .shared import json_native_encode, class_name, hash_class, get_jsonable_keyname
+from .shared import json_native_encode, class_name, hash_class, get_jsonable_keyname, has_all_keys
 
 JSONABLE_PREFIX = '$jsonable-'
 
@@ -60,7 +62,9 @@ def unregister(cls: type[JSONAbleABC]):
     _register_jsonable(cls, remove=True)
 
 
-def jsonable_encoder(obj: Any, fallback: EncoderFallbackType = None):
+def jsonable_encoder(
+        obj: Any, fallback: EncoderFallbackType = None
+) -> JSONSupportedBases | dict[str, JSONAbleEncodedDict]:
     if json_native_encode(obj):
         return obj
 
@@ -87,9 +91,11 @@ def jsonable_encoder(obj: Any, fallback: EncoderFallbackType = None):
 def dumps(obj: JSONSupportedTypes, fallback: EncoderFallbackType = None, **kwargs):
     kwargs.setdefault('ensure_ascii', False)
     kwargs.pop('default', None)
+
     return std_dumps(obj, default=lambda _obj: jsonable_encoder(_obj, fallback), **kwargs)
 
 
+@deprecated(version='0.0.2', reason='use object_pairs_hook argument instead')
 class JSONAbleDecoder(JSONDecoder):
     def _convert2jsonable(self, iterable: JSONSupportedEditableIters):
         for key, value in iterable.copy().items() if isinstance(iterable, dict) else enumerate(iterable):
@@ -98,17 +104,18 @@ class JSONAbleDecoder(JSONDecoder):
                 if isinstance(jsonable_key, str) and jsonable_key.startswith(JSONABLE_PREFIX):
                     jsonable_dict: JSONAbleEncodedDict = value[jsonable_key]
 
-                    cls = _search_jsonable_by_hash(jsonable_dict['hash'])
-                    if cls is None:
-                        raise TypeError(
-                            f'Cannot decode {jsonable_key[len(JSONABLE_PREFIX):] or "Unknown"} to Python Object'
-                        )
+                    if has_all_keys(jsonable_dict, JSONAbleEncodedDict):
+                        cls = _search_jsonable_by_hash(jsonable_dict['hash'])
+                        if cls is None:
+                            raise TypeError(
+                                f'Cannot decode {jsonable_key[len(JSONABLE_PREFIX):] or "Unknown"} to Python Object'
+                            )
 
-                    if isinstance(jsonable_dict['data'], JSONSupportedEditableIters):
-                        self._convert2jsonable(jsonable_dict['data'])
+                        if isinstance(jsonable_dict['data'], JSONSupportedEditableIters):
+                            self._convert2jsonable(jsonable_dict['data'])
 
-                    iterable[key] = cls.__jsonable_decode__(jsonable_dict['data'])
-                    continue
+                        iterable[key] = cls.__jsonable_decode__(jsonable_dict['data'])
+                        continue
 
             if isinstance(value, JSONSupportedEditableIters):
                 self._convert2jsonable(value)
@@ -120,10 +127,48 @@ class JSONAbleDecoder(JSONDecoder):
         return encoded_dict
 
 
-def loads(s: str, **kwargs):
-    kwargs.pop('cls', None)
+def jsonable_decoder(
+        object_pairs: list[tuple[JSONSupportedBases, JSONSupportedBases]],
+        fallback: DecoderFallbackType = None
+) -> dict[JSONSupportedBases, JSONSupportedBases | JSONAbleABC]:
+    result = {}
 
-    return std_loads(s, cls=JSONAbleDecoder, **kwargs)
+    for key, value in object_pairs:
+        if not isinstance(value, dict):
+            result[key] = value
+            continue
+
+        jsonable_key = get_jsonable_keyname(value)
+        if not (isinstance(jsonable_key, str) and jsonable_key.startswith(JSONABLE_PREFIX)):
+            result[key] = value
+            continue
+
+        jsonable_dict: JSONAbleEncodedDict = value[jsonable_key]
+        if not has_all_keys(jsonable_dict, JSONAbleEncodedDict):
+            result[key] = value
+            continue
+
+        cls = _search_jsonable_by_hash(jsonable_dict['hash'])
+        if cls is None:
+            if fallback is None:
+                raise TypeError(
+                    f'Cannot decode {jsonable_key[len(JSONABLE_PREFIX):] or "Unknown"} to Python Object'
+                )
+
+            result[key] = fallback(jsonable_dict)
+            continue
+
+        result[key] = cls.__jsonable_decode__(jsonable_dict['data'])
+
+    return result
+
+
+def loads(s: str, fallback: DecoderFallbackType = None, **kwargs):
+    # kwargs.pop('cls', None)
+    kwargs.pop('object_pairs_hook', None)
+
+    # return std_loads(s, cls=JSONAbleDecoder, **kwargs)
+    return std_loads(s, object_pairs_hook=lambda _pairs: jsonable_decoder(_pairs, fallback), **kwargs)
 
 
 def dump(obj: Any, fp: 'SupportsWrite[str]', fallback: EncoderFallbackType = None, **kwargs):
@@ -132,10 +177,12 @@ def dump(obj: Any, fp: 'SupportsWrite[str]', fallback: EncoderFallbackType = Non
     std_dump(obj, fp, default=lambda _obj: jsonable_encoder(_obj, fallback), **kwargs)
 
 
-def load(fp: 'SupportsRead[str]', **kwargs):
-    kwargs.pop('cls', None)
+def load(fp: 'SupportsRead[str]', fallback: DecoderFallbackType = None, **kwargs):
+    # kwargs.pop('cls', None)
+    kwargs.pop('object_pairs_hook', None)
 
-    return std_load(fp, cls=JSONAbleDecoder, **kwargs)
+    # return std_load(fp, cls=JSONAbleDecoder, **kwargs)
+    return std_load(fp, object_pairs_hook=lambda _pairs: jsonable_decoder(_pairs, fallback), **kwargs)
 
 
 __all__ = (

@@ -1,4 +1,4 @@
-from typing import Any, TypeVar
+from typing import Any, TypeVar, TypedDict
 from json.encoder import JSONEncoder
 from hashlib import sha256
 
@@ -53,6 +53,20 @@ def hash_class(cls: Any) -> tuple[str, HashMethods]:
         return cls_name, 'default'
 
 
-def get_jsonable_keyname(obj: dict):
-    keys = tuple(obj.keys())
+def get_jsonable_keyname(obj: dict | tuple[JSONSupportedBases, dict]):
+    keys = tuple(obj.keys()) if isinstance(obj, dict) else tuple(obj[1].keys())
     return keys[0] if len(keys) == 1 else None
+
+
+def has_key(dic: dict, keyname: str):
+    try:
+        _ = dic[keyname]
+        return True
+    except KeyError:
+        return False
+
+
+def has_all_keys(dic: dict, typed: type[TypedDict]):
+    return all(
+        has_key(dic, key) for key in typed.__annotations__.keys()
+    )

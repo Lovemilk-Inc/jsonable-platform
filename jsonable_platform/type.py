@@ -65,3 +65,4 @@ class JSONAbleEncodedDict(TypedDict):
 
 HashMethods = Literal['default', 'custom']
 EncoderFallbackType = Callable[[Any], JSONAbleEncodedDict]
+DecoderFallbackType = Callable[[JSONAbleEncodedDict], Any]
