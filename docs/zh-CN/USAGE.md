@@ -6,7 +6,7 @@
 * 参数
     * obj: 符合 JSON 标准且仅含有 JSON 原生支持 或 基于 `JSONAbleABC` 实现的可转化为 JSON 字符串的对象
     * fallback: 选填, 默认为 `None`, 当 本模块 无法转换对象时, 将该对象作为第一个参数传入 `fallback`, 其应当返回 `JSONAbleEncodedDict` 格式的 `dict` <br>
-      同时, 当 `fallback` 返回值不是 `JSONAbleEncodedDict` 时, 会抛出 `TypeError`
+      同时, 当 `fallback` 返回值不是 `JSONAbleEncodedDict` 时, 会抛出 `ValueError`
     * \*\*kwargs: 任意符合内置 `json.dumps` 函数的键值参数 (详情请参阅 [此处](https://docs.python.org/zh-cn/3.12/library/json.html#json.dumps))
       > 注意: 暂不支持 `default` 参数, 且 `ensure_ascii` 参数 默认为 `False`
 
@@ -19,7 +19,7 @@
     * obj: 符合 JSON 标准且仅含有 JSON 原生支持 或 基于 `JSONAbleABC` 实现的可转化为 JSON 字符串的对象
     * fp: 写入的目标文件的 `FilePoint` (文件指针)
     * fallback: 选填, 默认为 `None`, 当 本模块 无法转换对象时, 将该对象作为第一个参数传入 `fallback`, 其应当返回 `JSONAbleEncodedDict` 格式的 `dict` <br>
-      同时, 当 `fallback` 返回值不是 `JSONAbleEncodedDict` 时, 会抛出 `TypeError`
+      同时, 当 `fallback` 返回值不是 `JSONAbleEncodedDict` 时, 会抛出 `ValueError`
     * \*\*kwargs: 任意符合内置 `json.dump` 函数的键值参数 (详情请参阅 [此处](https://docs.python.org/zh-cn/3.12/library/json.html#json.dump))
       > 注意: 暂不支持 `default` 参数, 且 `ensure_ascii` 参数 默认为 `False`
 
@@ -31,7 +31,7 @@
 * 参数
     * s: 待转换的字符串, 应当符合 JSON 格式
     * fallback: 选填, 默认为 `None`, 当 本模块 无法转换对象时, 将该对象作为第一个参数传入 `fallback`, 其应当返回 任意 Python 对象 <br>
-      同时, 当 `fallback` 未传入时, 会抛出 `TypeError`
+      同时, 当 `fallback` 未传入时, 会抛出 `ValueError`
     * \*\*kwargs: 任意符合内置 `json.loads` 函数的键值参数 (详情请参阅 [此处](https://docs.python.org/zh-cn/3.12/library/json.html#json.loads))
       > 注意: 暂不支持 `object_pairs_hook` 参数
 
@@ -43,7 +43,7 @@
 * 参数
     * fp: 待转换的 `FilePoint` (文件指针), 文件内容应当符合 JSON 格式
     * fallback: 选填, 默认为 `None`, 当 本模块 无法转换对象时, 将该对象作为第一个参数传入 `fallback`, 其应当返回 任意 Python 对象 <br>
-      同时, 当 `fallback` 未传入时, 会抛出 `TypeError`
+      同时, 当 `fallback` 未传入时, 会抛出 `ValueError`
     * \*\*kwargs: 任意符合内置 `json.load` 函数的键值参数 (详情请参阅 [此处](https://docs.python.org/zh-cn/3.12/library/json.html#json.load))
       > 注意: 暂不支持 `object_pairs_hook` 参数
 
@@ -66,12 +66,12 @@
 * 返回: `None`
 
 ### 函数: `jsonable_platform.jsonable_encoder(obj, fallback=None)`
-* 编码任意 JSON 原生支持 或 继承与 `JSONAbleABC` 的符合 jsonable 标准的对象
+* 编码任意 JSON 原生支持 或 继承于 `JSONAbleABC` 的符合 jsonable 标准的对象
 
 * 参数
     * obj: 符合 JSON 标准且仅含有 JSON 原生支持 或 基于 `JSONAbleABC` 实现的可转化为 JSON 字符串的对象
     * fallback: 选填, 默认为 `None`, 当 本模块 无法转换对象时, 将该对象作为第一个参数传入 `fallback`, 其应当返回 `JSONAbleEncodedDict` 格式的 `dict` <br>
-      同时, 当 `fallback` 返回值不是 `JSONAbleEncodedDict` 时, 会抛出 `TypeError`
+      同时, 当 `fallback` 返回值不是 `JSONAbleEncodedDict` 时, 会抛出 `ValueError`
 
 * 返回: 当传入原生 JSON 支持的 Python 对象 时, 直接返回该对象, 否则尝试使用 jsonable 编码, 返回字典如下结构: `{ '<JSONABLE_PREFIX><对象名称>': JSONAbleEncodedDict }` <br>
 其中, `JSONABLE_PREFIX` 为 `jsonable_platform.JSONABLE_PREFIX` 字符串常量
@@ -82,9 +82,26 @@
 * 参数
     * object_pairs: 符合 内置 `json.load(s)` `object_pairs_hook` 参数回调函数第一个参数类型的 列表
     * fallback: 选填, 默认为 `None`, 当 本模块 无法转换对象时, 将该对象作为第一个参数传入 `fallback`, 其应当返回 任意 Python 对象 <br>
-      同时, 当 `fallback` 未传入时, 会抛出 `TypeError`
+      同时, 当 `fallback` 未传入时, 会抛出 `ValueError`
 
 * 返回: 含有 Python 对象的字典
+
+### 函数: `jsonable_platform.directly_encoder(obj)`
+* 编码任意 继承于 `JSONAbleABC` 的符合 jsonable 标准的对象
+
+* 参数
+    * obj: 符合 JSON 标准且仅含有 JSON 原生支持 或 基于 `JSONAbleABC` 实现的可转化为 JSON 字符串的对象
+
+* 返回: 尝试使用 jsonable 编码, 返回字典 (`JSONAbleEncodedDict`) 如下结构: `{ '<JSONABLE_PREFIX><对象名称>': JSONAbleEncodedDict }` <br>
+其中, `JSONABLE_PREFIX` 为 `jsonable_platform.JSONABLE_PREFIX` 字符串常量. 如果编码失败, 则抛出 `ValueError`
+
+### 函数: `jsonable_platform.directly_decoder(encoded)`
+* 解码 `JSONAbleEncodedDict` 回 Python 对象
+
+* 参数
+    * encoded: `JSONAbleEncodedDict` 格式的字典
+
+* 返回: Python 对象. 当所给的字典内 key (键) 非全部包括 `JSONAbleEncodedDict` 定义的 keys (键) 时, 抛出 `KeyError`; 当解码失败, 抛出 `ValueError`
 
 ### 类: `JSONAbleABC()`
 * jsonable 基类, 实现类方法 `__jsonable_encode__` 和 `__jsonable_decode__` 后, 方可被转换

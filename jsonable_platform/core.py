@@ -1,4 +1,4 @@
-from typing import Any, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING, Iterable
 
 if TYPE_CHECKING:
     from _typeshed import SupportsWrite, SupportsRead
@@ -63,29 +63,21 @@ def unregister(cls: type[JSONAbleABC]):
 
 
 def jsonable_encoder(
-        obj: Any, fallback: EncoderFallbackType = None
+        obj: JSONSupportedTypes | JSONAbleABC, fallback: EncoderFallbackType = None
 ) -> JSONSupportedBases | dict[str, JSONAbleEncodedDict]:
     if json_native_encode(obj):
         return obj
 
-    cls, hdx = _search_jsonable_by_object(obj)
-    if cls is not None and hdx is not None:
-        data = cls.__jsonable_encode__(obj)
-        if isinstance(data, JSONSupportedEditableIters):
-            map(lambda _obj: jsonable_encoder(_obj, fallback), data)
+    try:
+        return directly_encoder(obj)
+    except ValueError:
+        res = fallback(obj) if fallback is not None else None
+        if isinstance(res, JSONAbleEncodedDict):
+            return {
+                f'{JSONABLE_PREFIX}{class_name(obj)}': res
+            }
 
-        # { JSONABLE_PREFIX<class_name>: { 'data': data } }
-        return {
-            f'{JSONABLE_PREFIX}{class_name(obj)}': JSONAbleEncodedDict(hash=hdx, data=data)
-        }
-
-    res = fallback(obj) if fallback is not None else None
-    if isinstance(res, JSONAbleEncodedDict):
-        return {
-            f'{JSONABLE_PREFIX}{class_name(obj)}': res
-        }
-
-    raise TypeError(f'Cannot convert {class_name(class_name(obj), "Unknown")} to JSON')
+        raise
 
 
 def dumps(obj: JSONSupportedTypes, fallback: EncoderFallbackType = None, **kwargs):
@@ -128,37 +120,43 @@ class JSONAbleDecoder(JSONDecoder):
 
 
 def jsonable_decoder(
-        object_pairs: list[tuple[JSONSupportedBases, JSONSupportedBases]],
-        fallback: DecoderFallbackType = None
+        object_pairs: Iterable[tuple[JSONSupportedBases, JSONSupportedBases]],
+        fallback: DecoderFallbackType = None,
 ) -> dict[JSONSupportedBases, JSONSupportedBases | JSONAbleABC]:
     result = {}
 
     for key, value in object_pairs:
+        if not isinstance(value, JSONSupportedEditableIters):
+            result[key] = value
+
+        if isinstance(value, list):
+            result[key] = list(jsonable_decoder(enumerate(value), fallback).values())
+            continue
+
         if not isinstance(value, dict):
             result[key] = value
             continue
 
         jsonable_key = get_jsonable_keyname(value)
         if not (isinstance(jsonable_key, str) and jsonable_key.startswith(JSONABLE_PREFIX)):
-            result[key] = value
+            result[key] = jsonable_decoder(value.items(), fallback)
             continue
 
         jsonable_dict: JSONAbleEncodedDict = value[jsonable_key]
-        if not has_all_keys(jsonable_dict, JSONAbleEncodedDict):
+        try:
+            result[key] = directly_decoder(jsonable_dict)
+            continue
+        except KeyError:
             result[key] = value
             continue
-
-        cls = _search_jsonable_by_hash(jsonable_dict['hash'])
-        if cls is None:
+        except ValueError:
             if fallback is None:
-                raise TypeError(
+                raise ValueError(
                     f'Cannot decode {jsonable_key[len(JSONABLE_PREFIX):] or "Unknown"} to Python Object'
                 )
 
             result[key] = fallback(jsonable_dict)
             continue
-
-        result[key] = cls.__jsonable_decode__(jsonable_dict['data'])
 
     return result
 
@@ -185,6 +183,37 @@ def load(fp: 'SupportsRead[str]', fallback: DecoderFallbackType = None, **kwargs
     return std_load(fp, object_pairs_hook=lambda _pairs: jsonable_decoder(_pairs, fallback), **kwargs)
 
 
+def directly_encoder(obj: JSONAbleABC):
+    cls, hdx = _search_jsonable_by_object(obj)
+    if cls is not None and hdx is not None:
+        data = cls.__jsonable_encode__(obj)
+        if isinstance(data, JSONSupportedEditableIters):
+            map(directly_encoder, data)
+
+        # { <JSONABLE_PREFIX><class_name>: { 'hash': hash, 'data': data } }
+        return {
+            f'{JSONABLE_PREFIX}{class_name(obj)}': JSONAbleEncodedDict(hash=hdx, data=data)
+        }
+
+    raise ValueError(f'Cannot convert {class_name(class_name(obj), "Unknown")} to JSON')
+
+
+def directly_decoder(encoded: JSONAbleEncodedDict) -> JSONAbleABC:
+    if not has_all_keys(encoded, JSONAbleEncodedDict):
+        raise KeyError('Miss key(s)')
+
+    cls = _search_jsonable_by_hash(encoded['hash'])
+
+    if cls is None:
+        raise ValueError(
+            f'Cannot decode to Python Object'
+        )
+
+    return cls.__jsonable_decode__(encoded['data'])
+
+
 __all__ = (
-    'dump', 'dumps', 'load', 'loads', 'register', 'unregister', 'jsonable_encoder', 'JSONAbleDecoder', 'JSONABLE_PREFIX'
+    'dump', 'dumps', 'load', 'loads', 'register', 'unregister', 'jsonable_encoder', 'JSONAbleDecoder',
+    'jsonable_decoder', 'directly_decoder', 'directly_encoder',
+    'JSONABLE_PREFIX'
 )
