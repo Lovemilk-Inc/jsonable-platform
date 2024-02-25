@@ -27,11 +27,11 @@ class datetime(std_datetime, JSONAbleABC[float]):
 register(datetime)  # 将 datetime 注册到转换器中, 以便自动查找并转换
 ```
   * 类方法详解
-      * `__jsonable_encode__`, 必须实现, 第一个参数为待转换的对象, 返回编码后的可转换为 JSON 的 Python 基本类型 或 jsonable 类 实例化后的对象
+      * `__jsonable_encode__(cls, obj)`, 必须实现, 第一个参数为待转换的对象, 返回编码后的可转换为 JSON 的 Python 基本类型 或 jsonable 类 实例化后的对象
           > 注意: Python 字典的键 (key) 不能为 jsonable 类 实例化后的对象, 其他元素均可为 jsonable 类 实例化后的对象
-      * `__jsonable_decode__`, 必须实现, 第一个参数为 编码后的对象, 将编码后的 可转为JSON的 Python 基本类型 转为自己的实例, 如果有多层嵌套, 转换器会自动处理, 无需手动转换
-      * `__jsonable_hash__`, 可选, 用于查找编码后的类 hash 和 目标类, 默认返回 `None`, 如果返回为 字符串, 则使用该字符串作为 hash
+      * `__jsonable_decode__(cls, data)`, 必须实现, 第一个参数为 编码后的对象, 将编码后的 可转为JSON的 Python 基本类型 转为自己的实例, 如果有多层嵌套, 转换器会自动处理, 无需手动转换
+      * `__jsonable_hash__(cls)`, 可选, 用于查找编码后的类 hash 和 目标类, 默认返回 `None`, 如果返回为 字符串, 则使用该字符串作为 hash
 
   * ## 注册类
-     * 使用 `register` 函数注册类, 后会根据类型匹配并自动调用 `__jsonable_encode__` 类方法
-     * 同样的, 您可以使用 `unregister` 取消注册类
+     * 使用 `register(cls)` 函数注册类, 后会根据类型匹配并自动调用 `__jsonable_encode__` 类方法
+     * 同样的, 您可以使用 `unregister(cls)` 取消注册类

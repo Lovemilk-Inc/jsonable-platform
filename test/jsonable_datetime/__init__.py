@@ -14,11 +14,11 @@ class datetime(std_datetime, JSONAbleABC[float]):
 
 class timedelta(std_timedelta, JSONAbleABC[float]):
     @classmethod
-    def __jsonable_encode__(cls, obj: Self):
+    def __jsonable_encode__(cls, obj: Self) -> JSONAbleABCEncodedType:
         return obj.total_seconds()
 
     @classmethod
-    def __jsonable_decode__(cls, obj) -> Self:
+    def __jsonable_decode__(cls, obj: JSONAbleABCEncodedType) -> Self:
         return cls(seconds=obj)
 
 
