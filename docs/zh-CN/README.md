@@ -25,3 +25,6 @@ pip install jsonable-platform
      * 本模块提供了类似于 Python 官方 `json` 库的接口, 您只需使用 `dump`, `dumps`, `load`, `loads` 即可使用
      更为详细的使用文档, 请参阅 [jsonable-platform 使用方法](USAGE.md)
      > 注意: dump(s) 的 `default` 参数和 load(s) 的 `object_pairs_hook` 参数不可用
+
+## 关于项目
+* 本项目名称可读作: json + able (able 读 /əbəl/) + platform, 听起来像: json(单词读音) 啊(轻声) able(去掉 a 发的音) platform(单词读音)

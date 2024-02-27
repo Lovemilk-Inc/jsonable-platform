@@ -1,7 +1,7 @@
 # 发布您自己的 `jsonable-platform` 插件
 
 > [!NOTE]
-> `<>` (尖括号) 代表该参数必选, `[]` (方括号) 代表该参数可选, 使用时无需输入括号, 括号内代表 参数名称 或 您应当填入的内容的名称
+> `<>` (尖括号) 代表该参数必选, `[]` (方括号) 代表该参数可选, 使用时无需输入括号, 括号内字段代表 参数名称 或 您应当填入的内容的名称
 
 # 准备工作
 ### 安装 依赖管理和打包工具
@@ -52,13 +52,13 @@ poetry new <项目名称>
 > 如果您不知道文件有什么作用, 请不要随意修改
 
 首先让我们关注插件目录中的 `pyproject.toml` 文件. 这个文件非常重要, 它包含了要发布插件的一切元信息.
-打开上述文件, 你会看到它大概长这样:
+打开上述文件, 您会看到它大概长这样:
 ```toml
 [tool.poetry]
 name = "<包名>"
 version = "0.1.0"
 description = ""
-authors = ["Your Name <name@example.com>"]
+authors = ["<Your Name> <<name@example.com>>"]
 readme = "README.md"
 packages = [{include = "poetry_demo"}]
 
@@ -70,7 +70,7 @@ python = "^3.7"
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 ```
-> 上述文件 `tool.poetry.authors` 字段的邮箱格式如下 `<xxxxx@xxx.com>`, 两边尖括号不可省去
+> 上述文件 `tool.poetry.authors` 字段 `Your Name` 代表您的用户名, 空格隔开用尖括号包裹的为您的邮箱, 格式如下 `<name@example.com>`, 两边尖括号不可省去
 
 其中, 较为主要的字段如下
 
@@ -79,10 +79,10 @@ build-backend = "poetry.core.masonry.api"
 |    tool.poetry.name     |   包名    |     该包名用于区分包的唯一性, 不应当于现存于 Pypi 的包名重复 <br> 同时, 根据 jsonable-platform 的命名规则, 应当以 `jsonable_platform_`)      |
 |   tool.poetry.version   |   包版本   |                       包的版本号, 区分不同版本, 不得发同一个版本的包, 一般不得回滚版本 ~~(废话, 如果乐意, 可以每天更新一个玩~~                       |
 | tool.poetry.description |  包的描述   |                                             介绍给别人知道您的包干什么用的                                              |
-|   tool.poetry.authors   |  作者列表   |      格式见上方示例, 用于表达作者 ~~(虽然 DMCA[^dmca] 和这里的作者不一定有什么关系, 但是就是你写一下才能以作者的身份 发出 年轻人的第一份 DMCA[^dmca] ?~~       |
+|   tool.poetry.authors   |  作者列表   |      格式见上方示例, 用于表达作者 ~~(虽然 DMCA[^dmca] 和这里的作者不一定有什么关系, 但是就是您写一下才能以作者的身份 发出 年轻人的第一份 DMCA[^dmca] ?~~       |
 |   tool.poetry.readme    | 自述文件的路径 |                               自述文件用于介绍项目 和/或 部署流程, 建议使用 `Markdown`[^md] 格式                               |
 |  tool.poetry.packages   | 包的本地路径  | 应当符合 Python 包格式, Poetry 假设您的包包含一个与项目根目录中的 tool.poetry.name 同名的包. 若无, 请填充 tool.poetry.packages 以指定您的包及其位置 |
-> 请注意: 包名和版本号都是唯一的: 包名不能与其他已经发布的包相同, 而同一个包的同一个版本号也只能发布一次. 如果出现了包名冲突或版本号冲突, 则会在之后的发布流程中出现错误提示. 你可以自行根据错误提示更改包名或更新插件版本.
+> 请注意: 包名和版本号都是唯一的. 包名不能与其他已经发布的包相同, 而同一个包的同一个版本号也只能发布一次. 如果出现了包名冲突或版本号冲突, 则会在之后的发布流程中出现错误提示. 您可以自行根据错误提示更改包名或更新插件版本.
 
 修改上述文件, 填写相关信息, 保存后即可完成 初始化 的全部流程了
 
