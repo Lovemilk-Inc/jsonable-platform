@@ -19,7 +19,7 @@ pip install jsonable-platform
      选择合适的 Pypi 包 安装即可
   
      * 作为进阶用户, 您可以 [自定义 jsonable 类, 详情请参阅此处](PLUGIN_ABOUT/CUSTOM_CLASS.md) <br>
-     学习自定义 jsonable 类的方法后, 您可以编写适用于 `jsonable-platform` 的插件并发布. 教程请参阅 [插件编写](PLUGIN_ABOUT/PLUGIN_START.md)
+     学习自定义 jsonable 类的方法后, 您可以编写适用于 `jsonable-platform` 的插件并发布. 教程请参阅 [插件编写](PLUGIN_ABOUT/START.md)
   
   2. ### 编解码
      * 本模块提供了类似于 Python 官方 `json` 库的接口, 您只需使用 `dump`, `dumps`, `load`, `loads` 即可使用
