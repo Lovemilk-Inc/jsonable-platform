@@ -1,8 +1,8 @@
 from typing import Any, TypeVar, TypedDict
 from json.encoder import JSONEncoder
-from hashlib import sha256
+# from hashlib import sha256
 
-from .type import HashMethods, JSONSupportedBases
+from .type import HashMethods, JSONSupportedBases, JSONAbleABCType
 
 # from type import JSONSupportedTypes, JSONSupportedBases, JSONSupportedIterables
 
@@ -36,7 +36,7 @@ def class_name(obj_or_cls: Any, default: DefaultType = None) -> str | DefaultTyp
     return default
 
 
-def hash_class(cls: Any) -> tuple[str, HashMethods]:
+def hash_class(cls: JSONAbleABCType | type[object]) -> tuple[str, HashMethods]:
     res = None
     func = getattr(cls, '__jsonable_hash__', None)
     if callable(func):
@@ -66,7 +66,21 @@ def has_key(dic: dict, keyname: str):
         return False
 
 
-def has_all_keys(dic: dict, typed: type[TypedDict]):
-    return all(
-        has_key(dic, key) for key in typed.__annotations__.keys()
-    )
+def has_all_keys(dic: dict, typed: type[TypedDict], *, raise_error: bool = False) -> bool:
+    if isinstance(getattr(typed, '__annotations__', None), dict):
+        return all(
+            has_key(dic, key) for key in typed.__annotations__.keys()
+        )
+
+    if raise_error:
+        raise TypeError(f'Cannot get `__annotations__` from `{class_name(typed)}`')
+
+    return True
+
+
+def match_class_from_object(obj: Any, cls: JSONAbleABCType) -> bool:
+    return isinstance(obj, cls)
+
+
+def match_class_from_hash(hdx: str, cls: JSONAbleABCType) -> bool:
+    return hdx == hash_class(cls)[0]

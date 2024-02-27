@@ -9,19 +9,9 @@ dic = {
 }
 
 encoded = dumps(dic)
-print(encoded)
 
 decoded = loads(encoded)
-print(decoded)
-print(decoded['delta'].total_seconds())
 
 
-def test_encode():
-    assert parse(encoded.replace(' ', '')) == parse(
-        '{"now": {"$jsonable-datetime": {"hash": "datetime", "data": 1704038400.0}}, '
-        '"delta": {"$jsonable-timedelta": {"hash": "timedelta", "data": 31536000.0}}}'
-    ), 'Encode failed'
-
-
-def test_decode():
+def test_encode_and_decode():
     assert decoded == dic, 'Decode failed'

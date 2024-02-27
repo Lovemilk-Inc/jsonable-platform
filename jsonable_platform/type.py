@@ -1,5 +1,5 @@
 from sys import version_info
-from typing import TypedDict, TypeAlias, TypeVar, Literal, Union, Generic, Any, Callable
+from typing import TypedDict, TypeAlias, TypeVar, Literal, Union, Generic, Any, Callable, Iterable
 
 JSONAbleClassID: TypeAlias = str
 
@@ -53,15 +53,30 @@ class JSONAbleABC(Generic[JSONAbleABCEncodedType]):
         raise NotImplemented
 
 
+JSONAbleABCType = type[JSONAbleABC]
+RequirementsType = Iterable[JSONAbleABCType]
+
+
+class DefinedClassesData(TypedDict):
+    cls: JSONAbleABCType
+    requirements: RequirementsType
+
+
 class DefinedClasses(TypedDict):
-    names: dict[JSONAbleClassID, type[JSONAbleABC]]
-    classes: dict[JSONAbleClassID, type[JSONAbleABC]]
+    names: dict[JSONAbleClassID, DefinedClassesData]
+    classes: dict[JSONAbleClassID, DefinedClassesData]
 
 
 class JSONAbleEncodedDict(TypedDict):
     hash: str
     data: JSONSupportedTypes
 
+
+class RequiredEncodedDict(JSONAbleEncodedDict):
+    parent: str
+
+
+JSONAbleEncodedType = Union[JSONAbleABCEncodedType, RequiredEncodedDict]
 
 HashMethods = Literal['default', 'custom']
 EncoderFallbackType = Callable[[Any], JSONAbleEncodedDict]

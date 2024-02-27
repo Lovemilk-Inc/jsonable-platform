@@ -49,11 +49,12 @@
 
 * 返回: Python 对象
 
-### 函数: `jsonable_platform.register(cls)`
+### 函数: `jsonable_platform.register(cls, *requirements)`
 * 注册类, 以便查找与自动转换
 
 * 参数: 
-    * cls: 继承于 `JSONAbleABC` 且实现其方法的类, 具体实现方法请参阅 [自定义 jsonable 类](./CUSTOM_CLASS.md)
+    * cls: 继承于 `JSONAbleABC` 且实现其方法的类, 具体实现方法请参阅 [自定义 jsonable 类](PLUGIN_ABOUT/CUSTOM_CLASS.md)
+    * *requirements: (多个) 继承于 `JSONAbleABC` 且实现其方法的类, 优先使用该依赖项内匹配的类, 若找不到则在全局搜索并类编/解码
 
 * 返回: `None`
 
@@ -61,7 +62,7 @@
 * 取消注册类
 
 * 参数: 
-    * cls: 继承于 `JSONAbleABC` 且实现其方法的类, 具体实现方法请参阅 [自定义 jsonable 类](./CUSTOM_CLASS.md)
+    * cls: 继承于 `JSONAbleABC` 且实现其方法的类, 具体实现方法请参阅 [自定义 jsonable 类](PLUGIN_ABOUT/CUSTOM_CLASS.md)
 
 * 返回: `None`
 
@@ -106,4 +107,4 @@
 ### 类: `JSONAbleABC()`
 * jsonable 基类, 实现类方法 `__jsonable_encode__` 和 `__jsonable_decode__` 后, 方可被转换
 
-* 类方法: 请参阅 [自定义 jsonable 类](./CUSTOM_CLASS.md)
+* 类方法: 请参阅 [自定义 jsonable 类](PLUGIN_ABOUT/CUSTOM_CLASS.md)

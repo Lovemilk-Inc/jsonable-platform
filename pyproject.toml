@@ -23,7 +23,6 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.9"
 typing_extensions = {version = "*", python = "< 3.11"}
-deprecated = "^1.2.14"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.1"
