@@ -16,12 +16,12 @@ REPR_CLASSNAME: bool = False
 
 _defined_classes: DefinedClasses = {
     'names': {},
-    'classes': {}
+    'customs': {}
 }
 
 
 def _search_jsonable_by_hash(hdx: str) -> tuple[JSONAbleABCType, RequirementsType] | None:
-    data = _defined_classes['classes'].get(hdx, None)
+    data = _defined_classes['customs'].get(hdx, None)
     if data is not None:
         return data['cls'], data['requirements']
 
@@ -35,7 +35,7 @@ def _search_jsonable_by_object(obj: JSONAbleABC) -> tuple[tuple[JSONAbleABCType,
     if hash_method == 'default':
         data = _defined_classes['names'].get(hdx, None)
     else:
-        data = _defined_classes['classes'].get(hdx, None)
+        data = _defined_classes['customs'].get(hdx, None)
 
     if data is None:
         return None, None
@@ -46,6 +46,10 @@ def _search_jsonable_by_object(obj: JSONAbleABC) -> tuple[tuple[JSONAbleABCType,
 def _register_jsonable(cls: JSONAbleABCType, *requirements: JSONAbleABCType, remove: bool = False):
     hdx, hash_method = hash_class(cls)
 
+    if not remove:
+        for requirement in requirements:
+            setattr(requirement, '__jsonable_parent__', hdx)
+
     if hash_method == 'default':
         if remove:
             _defined_classes['names'].pop(hdx, None)
@@ -53,9 +57,9 @@ def _register_jsonable(cls: JSONAbleABCType, *requirements: JSONAbleABCType, rem
             _defined_classes['names'][hdx] = DefinedClassesData(cls=cls, requirements=requirements)
     else:
         if remove:
-            _defined_classes['classes'].pop(hdx, None)
+            _defined_classes['customs'].pop(hdx, None)
         else:
-            _defined_classes['classes'][hdx] = DefinedClassesData(cls=cls, requirements=requirements)
+            _defined_classes['customs'][hdx] = DefinedClassesData(cls=cls, requirements=requirements)
 
 
 def register(cls: JSONAbleABCType, *requirements: JSONAbleABCType):
@@ -158,7 +162,7 @@ def load(fp: 'SupportsRead[str]', fallback: DecoderFallbackType = None, **kwargs
 
 def directly_encoder(obj: JSONAbleABC):
     requirements = ()
-    parent = getattr(obj, '__jsonable_parent__', '')
+    parent = getattr(type(obj), '__jsonable_parent__', '')
     if parent:
         parend_searched = _search_jsonable_by_hash(parent)
         if parend_searched is not None:
@@ -180,22 +184,6 @@ def directly_encoder(obj: JSONAbleABC):
         cls, defined_requirements = search_result
 
         data = cls.__jsonable_encode__(obj)
-        if defined_requirements:
-            def _each(_iter: list | dict):
-                """
-                each every JSONAbleABC object in anywhere in parent object to set the parent hash
-                :param _iter: list or dict
-                :return: None
-                """
-                for _item in _iter.values() if isinstance(_iter, dict) else _iter:
-                    if isinstance(_item, (list, dict)):
-                        _each(_item)
-                    elif isinstance(_item, JSONAbleABC):
-                        setattr(_item, '__jsonable_parent__', hdx)
-                        _each(vars(_item))
-
-            if isinstance(data, (list, dict)):
-                _each(data)
 
         # { <JSONABLE_PREFIX><class_name>: { 'hash': hash, 'data': data } }
         return {
@@ -238,8 +226,26 @@ def directly_decoder(
     raise ValueError(f'Cannot decode to Python Object')
 
 
+def _config(name: str, value: Any):
+    globals()[name] = value
+
+
+def jsonable_prefix(prefix: str = None):
+    if prefix is None:
+        return JSONABLE_PREFIX
+
+    _config('JSONABLE_PREFIX', str(prefix))
+
+
+def repr_classname(enable: bool = None):
+    if enable is None:
+        return REPR_CLASSNAME
+
+    _config('REPR_CLASSNAME', bool(enable))
+
+
 __all__ = (
     'dump', 'dumps', 'load', 'loads', 'register', 'unregister', 'jsonable_encoder',
     'jsonable_decoder', 'directly_decoder', 'directly_encoder',
-    'JSONABLE_PREFIX', 'REPR_CLASSNAME'
+    'JSONABLE_PREFIX', 'REPR_CLASSNAME', 'jsonable_prefix', 'repr_classname'
 )

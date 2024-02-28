@@ -132,7 +132,8 @@ class MyDatetime(datetime, JSONAbleABC):
 register(MyDatetime)  # 注册类
 ```
 
-当然, `register` 函数可以定义依赖, 使用如下方法:
+### 定义依赖
+使用 `register` 函数可以定义依赖, 使用如下方法:
 ```python
 from jsonable_platform import register
 

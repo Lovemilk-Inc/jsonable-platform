@@ -108,3 +108,19 @@
 * jsonable 基类, 实现类方法 `__jsonable_encode__` 和 `__jsonable_decode__` 后, 方可被转换
 
 * 类方法: 请参阅 [自定义 jsonable 类](PLUGIN_ABOUT/CUSTOM_CLASS.md)
+
+### 函数: `jsonable_platform.jsonable_prefix(prefix=None)`
+* 设置 `JSONABLE_PREFIX` 的值, 仅限字符串
+
+* 参数:
+  * prefix: 值, 该值代表 jsonable 编码后的 keyname (键名) 前缀, 未传入或传入为 `None` 时, 返回当前已设定的 `JSONABLE_PREFIX`
+
+* 返回: `None` 或 返回当前已设定的 `JSONABLE_PREFIX`
+
+### 函数: `jsonable_platform.repr_classname(enable=None)`
+* 设置 `REPR_CLASSNAME` 的值, 仅限 bool
+
+* 参数:
+  * enable: bool 值, 该值代表 是否使用 `repr(obj)` 作为 jsonable 编码后的 keyname (键名) 内容, 未传入或传入为 `None` 时, 返回当前已设定的 `REPR_CLASSNAME`
+
+* 返回: `None` 或 返回当前已设定的 `REPR_CLASSNAME`

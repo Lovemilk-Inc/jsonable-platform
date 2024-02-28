@@ -64,7 +64,7 @@ class DefinedClassesData(TypedDict):
 
 class DefinedClasses(TypedDict):
     names: dict[JSONAbleClassID, DefinedClassesData]
-    classes: dict[JSONAbleClassID, DefinedClassesData]
+    customs: dict[JSONAbleClassID, DefinedClassesData]
 
 
 class JSONAbleEncodedDict(TypedDict):

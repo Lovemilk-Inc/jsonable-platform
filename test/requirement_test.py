@@ -6,7 +6,7 @@ class RequirementC(JSONAbleABC):
         self.content = 'Anything~'
 
     def __repr__(self):
-        return f'RequirementC: {self.content}'
+        return f'RequirementC({self.content=})'
 
     @classmethod
     def __jsonable_encode__(cls, obj: Self) -> JSONAbleABCEncodedType:
@@ -25,7 +25,7 @@ class RequirementB(JSONAbleABC):
         self.datas = [RequirementC(), ]
 
     def __repr__(self):
-        return f'RequirementB: {self.content}'
+        return f'RequirementB({self.content=}, {self.datas=})'
 
     @classmethod
     def __jsonable_encode__(cls, obj: Self) -> JSONAbleABCEncodedType:
@@ -44,7 +44,7 @@ class RequirementA(JSONAbleABC):
         self.information = [RequirementB(), RequirementC()]
 
     def __repr__(self):
-        return f'RequirementA: {self.information}'
+        return f'RequirementA({self.information=})'
 
     @classmethod
     def __jsonable_encode__(cls, obj: Self) -> JSONAbleABCEncodedType:
@@ -70,4 +70,6 @@ def test_requirement():
 
     encoded = dumps({'test': RequirementA()})
 
-    assert isinstance(loads(encoded)['test'].information[0], RequirementB)
+    decoded = loads(encoded)
+
+    assert isinstance(decoded['test'].information[0], RequirementB)
