@@ -218,7 +218,7 @@ def directly_decoder(
     search_result = _search_jsonable_by_hash(encoded['hash'])
 
     if search_result is not None:
-        cls, defined_requirements = search_result
+        cls, _ = search_result
 
         data = encoded['data']
         return cls.__jsonable_decode__(data)
@@ -245,7 +245,7 @@ def repr_classname(enable: bool = None):
 
 
 __all__ = (
-    'dump', 'dumps', 'load', 'loads', 'register', 'unregister', 'jsonable_encoder',
-    'jsonable_decoder', 'directly_decoder', 'directly_encoder',
+    'dump', 'dumps', 'load', 'loads', 'register', 'unregister', 'jsonable_encoder', 'jsonable_decoder',
+    'directly_decoder', 'directly_encoder',
     'JSONABLE_PREFIX', 'REPR_CLASSNAME', 'jsonable_prefix', 'repr_classname'
 )
