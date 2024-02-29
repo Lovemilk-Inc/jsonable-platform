@@ -63,13 +63,17 @@ class DefinedClassesData(TypedDict):
 
 
 class DefinedClasses(TypedDict):
-    names: dict[JSONAbleClassID, DefinedClassesData]
+    defaults: dict[JSONAbleClassID, DefinedClassesData]
     customs: dict[JSONAbleClassID, DefinedClassesData]
+
+
+DefinedClassesKeysType = Literal['defaults', 'customs']
 
 
 class JSONAbleEncodedDict(TypedDict):
     hash: str
     data: JSONSupportedTypes
+    source: DefinedClassesKeysType
 
 
 class RequiredEncodedDict(JSONAbleEncodedDict):

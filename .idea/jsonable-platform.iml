@@ -5,6 +5,7 @@
       <sourceFolder url="file://$MODULE_DIR$/jsonable-platform" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/jsonable_platform" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/venv" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.10 (jsonable-platform)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />

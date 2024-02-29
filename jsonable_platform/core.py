@@ -1,4 +1,4 @@
-from typing import Any, TYPE_CHECKING, Iterable
+from typing import Any, TYPE_CHECKING, Iterable, TypeVar, get_args
 
 if TYPE_CHECKING:
     from _typeshed import SupportsWrite, SupportsRead
@@ -7,7 +7,7 @@ from json import dumps as std_dumps, loads as std_loads, dump as std_dump, load 
 
 from .type import JSONSupportedEditableIters, JSONSupportedTypes, JSONSupportedBases, JSONAbleABCType, RequirementsType
 from .type import EncoderFallbackType, DecoderFallbackType, JSONAbleEncodedDict, RequiredEncodedDict
-from .type import DefinedClasses, DefinedClassesData, JSONAbleABC, JSONAbleEncodedType
+from .type import DefinedClasses, DefinedClassesData, JSONAbleABC, JSONAbleEncodedType, DefinedClassesKeysType
 from .shared import json_native_encode, class_name, hash_class, get_jsonable_keyname, has_all_keys
 from .shared import match_class_from_object, match_class_from_hash
 
@@ -15,32 +15,51 @@ JSONABLE_PREFIX = '$jsonable'
 REPR_CLASSNAME: bool = False
 
 _defined_classes: DefinedClasses = {
-    'names': {},
+    'defaults': {},
     'customs': {}
 }
 
+defaultType = TypeVar('defaultType')
 
-def _search_jsonable_by_hash(hdx: str) -> tuple[JSONAbleABCType, RequirementsType] | None:
+
+def _search_jsonable(
+        target: str, source: DefinedClassesKeysType, *, default: defaultType = ...
+) -> tuple[JSONAbleABCType, RequirementsType] | defaultType:
+    _dict = _defined_classes[source]
+
+    try:
+        data = _dict[target]
+        return data['cls'], data['requirements']
+    except KeyError:
+        if default is not ...:
+            return default
+
+        raise
+
+
+def _search_jsonable_by_hash(hdx: str) -> tuple[JSONAbleABCType, RequirementsType, DefinedClassesKeysType] | None:
     data = _defined_classes['customs'].get(hdx, None)
     if data is not None:
-        return data['cls'], data['requirements']
+        return data['cls'], data['requirements'], 'customs'
 
-    data = _defined_classes['names'].get(hdx, None)
+    data = _defined_classes['defaults'].get(hdx, None)
     if data is not None:
-        return data['cls'], data['requirements']
+        return data['cls'], data['requirements'], 'defaults'
 
 
-def _search_jsonable_by_object(obj: JSONAbleABC) -> tuple[tuple[JSONAbleABCType, RequirementsType] | None, str | None]:
+def _search_jsonable_by_object(
+        obj: JSONAbleABC
+) -> tuple[tuple[JSONAbleABCType, RequirementsType] | None, str | None, DefinedClassesKeysType | None]:
     hdx, hash_method = hash_class(type(obj))
     if hash_method == 'default':
-        data = _defined_classes['names'].get(hdx, None)
+        data = _defined_classes['defaults'].get(hdx, None)
     else:
         data = _defined_classes['customs'].get(hdx, None)
 
     if data is None:
-        return None, None
+        return None, None, None
 
-    return (data['cls'], data['requirements']), hdx
+    return (data['cls'], data['requirements']), hdx, 'defaults' if hash_method == 'default' else 'customs'
 
 
 def _register_jsonable(cls: JSONAbleABCType, *requirements: JSONAbleABCType, remove: bool = False):
@@ -52,9 +71,9 @@ def _register_jsonable(cls: JSONAbleABCType, *requirements: JSONAbleABCType, rem
 
     if hash_method == 'default':
         if remove:
-            _defined_classes['names'].pop(hdx, None)
+            _defined_classes['defaults'].pop(hdx, None)
         else:
-            _defined_classes['names'][hdx] = DefinedClassesData(cls=cls, requirements=requirements)
+            _defined_classes['defaults'][hdx] = DefinedClassesData(cls=cls, requirements=requirements)
     else:
         if remove:
             _defined_classes['customs'].pop(hdx, None)
@@ -161,26 +180,25 @@ def load(fp: 'SupportsRead[str]', fallback: DecoderFallbackType = None, **kwargs
 
 
 def directly_encoder(obj: JSONAbleABC):
-    requirements = ()
     parent = getattr(type(obj), '__jsonable_parent__', '')
-    if parent:
-        parend_searched = _search_jsonable_by_hash(parent)
-        if parend_searched is not None:
-            requirements = parend_searched[1]
+    if isinstance(parent, str) and parent:
+        _, requirements, source = _search_jsonable_by_hash(parent)
+        if requirements is None:
+            requirements = ()
 
-    for requirement in requirements:
-        if not match_class_from_object(obj, requirement):
-            continue
+        for requirement in requirements:
+            if not match_class_from_object(obj, requirement):
+                continue
 
-        data = requirement.__jsonable_encode__(obj)
-        return {
-            f'{JSONABLE_PREFIX}-{class_name(obj) if not REPR_CLASSNAME else repr(obj)}': RequiredEncodedDict(
-                hash=hash_class(requirement)[0], data=data, parent=parent
-            )
-        }
+            data = requirement.__jsonable_encode__(obj)
+            return {
+                f'{JSONABLE_PREFIX}-{class_name(obj) if not REPR_CLASSNAME else repr(obj)}': RequiredEncodedDict(
+                    hash=hash_class(requirement)[0], data=data, parent=parent, source=source
+                )
+            }
 
-    search_result, hdx = _search_jsonable_by_object(obj)
-    if search_result is not None and hdx is not None:
+    search_result, hdx, source = _search_jsonable_by_object(obj)
+    if search_result is not None and hdx is not None and source is not None:
         cls, defined_requirements = search_result
 
         data = cls.__jsonable_encode__(obj)
@@ -189,7 +207,7 @@ def directly_encoder(obj: JSONAbleABC):
         return {
             f'{JSONABLE_PREFIX}-{class_name(obj) if not REPR_CLASSNAME else repr(obj)}':
                 JSONAbleEncodedDict(
-                    hash=hdx, data=data
+                    hash=hdx, data=data, source=source
                 )
         }
 
@@ -202,23 +220,39 @@ def directly_decoder(
     if not has_all_keys(encoded, JSONAbleEncodedType):
         raise KeyError('Miss key(s)')
 
-    requirements = ()
     parent = encoded.get('parent', '')
-    if parent:
-        parend_searched = _search_jsonable_by_hash(parent)
-        if parend_searched is not None:
-            requirements = parend_searched[1]
+    source = encoded.get('source', '')
+    if isinstance(parent, str) and parent:
+        if isinstance(source, str) and source in get_args(DefinedClassesKeysType):  # 其实这里已经判断过了, as any 下
+            source: Any
+            source: DefinedClassesKeysType
 
-    for requirement in requirements:
-        if not match_class_from_hash(encoded['hash'], requirement):
-            continue
+            _, requirements = _search_jsonable(parent, source, default=(None, None))
+        else:
+            _, requirements, source = _search_jsonable_by_hash(parent)
 
-        return requirement.__jsonable_decode__(encoded['data'])
+        if requirements is None:
+            requirements = ()
+
+        for requirement in requirements:
+            if not match_class_from_hash(encoded['hash'], requirement):
+                continue
+
+            return requirement.__jsonable_decode__(encoded['data'])
+
+    if isinstance(source, str) and source in get_args(DefinedClassesKeysType):  # 其实这里已经判断过了, as any 下
+        source: Any
+        source: DefinedClassesKeysType
+
+        cls, _ = _search_jsonable(parent, source, default=(None, None))
+
+        if cls is not None:
+            data = encoded['data']
+            return cls.__jsonable_decode__(data)
 
     search_result = _search_jsonable_by_hash(encoded['hash'])
-
     if search_result is not None:
-        cls, _ = search_result
+        cls, _, source = search_result
 
         data = encoded['data']
         return cls.__jsonable_decode__(data)
