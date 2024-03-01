@@ -82,10 +82,16 @@ def _register_jsonable(cls: JSONAbleABCType, *requirements: JSONAbleABCType, rem
 
 
 def register(cls: JSONAbleABCType, *requirements: JSONAbleABCType):
+    if not (issubclass(cls, JSONAbleABC) and all(issubclass(requirement, JSONAbleABC) for requirement in requirements)):
+        raise ValueError('cls and requirements must be subclasses of JSONAbleABC')
+
     _register_jsonable(cls, *requirements)
 
 
 def unregister(cls: JSONAbleABCType):
+    if not issubclass(cls, JSONAbleABC):
+        raise ValueError('cls must be subclasses of JSONAbleABC')
+
     _register_jsonable(cls, remove=True)
 
 
@@ -261,7 +267,12 @@ def directly_decoder(
 
 
 def _config(name: str, value: Any):
-    globals()[name] = value
+    global_dict = globals()
+    if name in global_dict:
+        global_dict[name] = value
+        return
+
+    raise KeyError(name)
 
 
 def jsonable_prefix(prefix: str = None):

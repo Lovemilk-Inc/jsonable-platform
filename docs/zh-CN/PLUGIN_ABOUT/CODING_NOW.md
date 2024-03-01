@@ -1,14 +1,12 @@
-from typing import Self
-
 # 开始编写插件
 现在, 请打开 `<包名>/__init__.py` (如果没有, 请自行创建) 进行编辑
 
 ## 认识插件
-本章将介绍插件的编写方式, 并介绍一些场景下的最佳实践.
+实现, 容我介绍插件的编写方式, 并介绍一些场景下的最佳实践.
 
 ### 插件的基本形式
 一个插件需要满足以下三个条件:
-1. 继承与 `JSONAbleABC` 类
+1. 继承于 `JSONAbleABC` 类
 2. 实现了 `JSONAbleABC` 的 `__jsonable_encode__` 和 `__jsonable_decode__` 方法
 3. 对该类进行导出使得用户得以使用 `register` 函数注册和 `unregister` 取消注册, 或者插件提供了导出的方法在插件内部完成类似行为
 
@@ -73,11 +71,11 @@ from jsonable_platform import JSONAbleABC, Self, JSONAbleABCEncodedType  # 引�
 class MyDatetime(datetime, JSONAbleABC):
     @classmethod
     def __jsonable_encode__(cls, obj: Self) -> JSONAbleABCEncodedType:
-        return obj.timestamp()  # 返回时间戳, 下面会收到这个时间戳
+        return obj.timestamp()  # 返回时间戳, 下面的 `__jsonable_decode__` 会收到这个时间戳
     
     @classmethod
     def __jsonable_decode__(cls, data: JSONAbleABCEncodedType) -> Self:
-        # 这里的 data 就是上面返回的 timestamp
+        # 这里的 data 就是上面的 `__jsonable_encode__` 返回的 timestamp
         return cls.fromtimestamp(data)
     
     @classmethod
@@ -92,7 +90,7 @@ class MyDatetime(datetime, JSONAbleABC):
       * obj: 实例化后的对象
     
     * 返回: 可原生转为 JSON 的类型 (如 `str`, `int`, `float`, `list`, `dict` 等) 和/或 jsonable 实例 (比如您自己实现的 `MyDatetime` 的实例或他人实现的类的实例)
-    > 当然, `dict[str, jsonable 实例]` `list[jsonable 实例]` 等也受支持, 这意味着您可以 嵌套编码. 为了避免一个 jsonable 类依赖另一个 jsonable 但后者未加载导致出现错误, 我们提供了 依赖声明, 以便维护依赖关系
+    > 当然, `dict[str, jsonable 实例]` `list[jsonable 实例]` 等也受支持, 这意味着您可以 嵌套编码. 为了避免一个 jsonable 类依赖另一个 jsonable 但后者未加载导致出现错误, 我们提供了 [依赖声明](#依赖声明), 以便维护依赖关系
 
     > 注: dict 的 keys (键) 不得为 jsonable 实例
 * `__jsonable_decode__(cls, data)`
@@ -103,45 +101,28 @@ class MyDatetime(datetime, JSONAbleABC):
     
     * 返回: 任意 Python Object, 不过应当 与自己的类型相同 或 为自己的子类的实例
 * `__jsonable_hash__(cls)`
-    * 获取对象的 hash
+    * **该函数并非必须实现** 获取对象的 hash
 
-    * 返回: 如果返回 `None`, 则使用 类名 (`cls.__name__`) 转为 hash, 否则, 使用 该函数返回值
+    * 返回: 如果返回 `None` (`JSONAbleABC` 默认返回), 则使用 类名 (`cls.__name__`) 作为 hash, 否则, 使用 该函数返回值, 且返回值必须为 `str`
 
 最后, 将类注册到 `jsonable-platform`, 以便自动搜索并编解码
 
 ```python
-from datetime import datetime
-from jsonable_platform import JSONAbleABC, Self, JSONAbleABCEncodedType, register  # 引入注册器
-
-
-class MyDatetime(datetime, JSONAbleABC):
-    @classmethod
-    def __jsonable_encode__(cls, obj: Self) -> JSONAbleABCEncodedType:
-        return obj.timestamp()  # 返回时间戳, 下面会收到这个时间戳
-    
-    @classmethod
-    def __jsonable_decode__(cls, data: JSONAbleABCEncodedType) -> Self:
-        # 这里的 data 就是上面返回的 timestamp
-        return cls.fromtimestamp(data)
-    
-    @classmethod
-    def __jsonable_hash__(cls) -> str | None:
-        # 这个函数是对象的 hash, hash 相同的对象会给到同一个 jsonable 类编解码
-        return 
-
 register(MyDatetime)  # 注册类
 ```
 
-### 定义依赖
-使用 `register` 函数可以定义依赖, 使用如下方法:
+这样, 当您使用 本框架 编解码 JSON 时, 会将 `MyDatetime` 实例转为 JSON 字符串 或 进行相反操作, 您无需手动转换即可持久化存储 Python 对象
+
+### 依赖声明
+使用 `register` 函数可以声明依赖, 使用方法如下:
 ```python
 from jsonable_platform import register
 
-register(<类>, <依赖00>, <依赖01>, ...)
+register(<cls>, <requirement01>, <requirements02>, ...)
 ```
-其中, `类` 为您所编写的类, 后面的 `依赖\d\d` (此处 `\d` 代表自然数) 代表所需依赖, 理论上依赖无数量限制
+其中, `cls` 为您所编写的类, 后面的 `requirement*` 代表所需依赖, 理论上依赖无数量限制
 
-这样, 您就可以使您的类优先在依赖项 (`requirements`) 中搜索并编解码
+这样, 您就可以使您的类优先在依赖项 (`requirements`) 中搜索并编解码, 而不会受到 外部重名 或 重 hash 类 的影响
 
 ## 注解
 

@@ -8,20 +8,8 @@
 Poetry 是适用于 Python 的依赖管理和打包工具, 使用其比手动配置 Python 项目文件更为迅速高效与简便.
 
 #### 安装 poetry
-
-使用 `pipx`:
-```shell
-pipx install poetry
-```
-
-使用 `pip`:
 ```shell
 pip install poetry
-```
-
-使用 `pacman`:
-```sh
-pacman -S python-poetry
 ```
 
 安装完成后, 尝试使用 `poetry --version` 检查是否安装成功.
@@ -35,7 +23,7 @@ pacman -S python-poetry
 ```shell
 poetry new <项目名称>
 ```
-其中, `项目名称` 代表您所创建的 Pypi 包的名称 (以下简称 "包名"), 尽可使用 半角字母 (大小写均可), 下划线 (`_`), 连字符 (`-`)
+其中, `项目名称` 代表您所创建的 Pypi 包的名称 (以下简称 "包名"), 仅可使用 半角英文字母 (大小写均可), 下划线 (`_`), 连字符 (`-`)
 > Poetry 会自动将 `-` 转化为 `_`, 安装时请使用您输入的包名, 但引入 (`import`) 时请使用以 `_` 连接的名称
 
 现在, 您应该会看到如下目录
@@ -52,6 +40,7 @@ poetry new <项目名称>
 > 如果您不知道文件有什么作用, 请不要随意修改
 
 首先让我们关注插件目录中的 `pyproject.toml` 文件. 这个文件非常重要, 它包含了要发布插件的一切元信息.
+
 打开上述文件, 您会看到它大概长这样:
 ```toml
 [tool.poetry]
@@ -70,8 +59,6 @@ python = "^3.7"
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 ```
-> 上述文件 `tool.poetry.authors` 字段 `Your Name` 代表您的用户名, 空格隔开用尖括号包裹的为您的邮箱, 格式如下 `<name@example.com>`, 两边尖括号不可省去
-
 其中, 较为主要的字段如下
 
 |          字段名称           |   作用    |                                                    描述                                                    |
@@ -85,6 +72,7 @@ build-backend = "poetry.core.masonry.api"
 > 请注意: 包名和版本号都是唯一的. 包名不能与其他已经发布的包相同, 而同一个包的同一个版本号也只能发布一次. 如果出现了包名冲突或版本号冲突, 则会在之后的发布流程中出现错误提示. 您可以自行根据错误提示更改包名或更新插件版本.
 
 修改上述文件, 填写相关信息, 保存后即可完成 初始化 的全部流程了
+> 上述文件 `tool.poetry.authors` 字段 `Your Name` 代表您的用户名, 空格隔开用尖括号包裹的为您的邮箱, 格式如下 `<name@example.com>`, 两边尖括号不可省去
 
 ### 下一步, [开始编写插件](CODING_NOW.md)
 
