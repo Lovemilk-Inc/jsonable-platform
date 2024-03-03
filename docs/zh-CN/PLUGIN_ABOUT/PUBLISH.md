@@ -6,7 +6,7 @@
 ## 创建并设置 Pypi Token
 ### 创建 Pypi Token
 Pypi Token 用于账户验证, 以便 依赖管理和打包工具 以您的身份发布包
-> [!DANGER]
+> [!CAUTION]
 > 请勿将该 token 发送给任何人, 否则, 可能导致您的账户被盗用 <br>
 > 并且, 无论您的账户是否启用 2FA[^2fa], 使用 token 均无需再次验证即可操作该 token 所拥有的权限 (不同 token 可配置不同的权限)
 
