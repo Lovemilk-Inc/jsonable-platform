@@ -1,7 +1,7 @@
 # 发布插件
 
 现在, 待您编写完成并测试之后, 让我们来发布插件吧!
-> 本章设计 Pypi 账户, 若您无, 请前往 <https://pypi.org/account/register/> 注册
+> 本章涉及 Pypi 账户, 若您无, 请前往 <https://pypi.org/account/register/> 注册
 
 ## 创建并设置 Pypi Token
 ### 创建 Pypi Token
