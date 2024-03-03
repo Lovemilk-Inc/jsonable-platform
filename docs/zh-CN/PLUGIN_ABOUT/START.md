@@ -78,10 +78,9 @@ build-backend = "poetry.core.masonry.api"
 
 ### 下一步, [开始编写插件](CODING_NOW.md)
 
-## 注解
-[^dmca]: <https://www.dmca.com/> 或 <https://zh.wikipedia.org/wiki/数字千年版权法>
-[^md]: <https://zh.wikipedia.org/wiki/Markdown>
-
 ## 参考资料
 1. <https://koishi.chat/zh-CN/guide/develop/publish.html>
 2. <https://python-poetry.org/docs/basic-usage/>
+
+[^dmca]: <https://www.dmca.com/> 或 <https://zh.wikipedia.org/wiki/数字千年版权法>
+[^md]: <https://zh.wikipedia.org/wiki/Markdown>

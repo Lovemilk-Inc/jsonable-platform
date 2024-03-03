@@ -70,9 +70,8 @@ poetry version <版本号>
 
 更多 `poetry version` 的详细用法, 请参阅 [Commands | Documentation | Poetry - Python dependency management and packaging made easy](https://python-poetry.org/docs/cli/#version)
 
-## 注解
-[^2fa]: <https://blog.pypi.org/posts/2023-05-25-securing-pypi-with-2fa/>
-
 ## 参考资料
 1. <https://python-poetry.org/docs/repositories/#configuring-credentials>
 2. <https://koishi.chat/zh-CN/guide/develop/publish.html#更新插件版本>
+
+[^2fa]: <https://blog.pypi.org/posts/2023-05-25-securing-pypi-with-2fa/>
