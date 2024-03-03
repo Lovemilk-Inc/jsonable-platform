@@ -22,10 +22,8 @@ if version_info >= (3, 11):
 else:
     from typing_extensions import Self
 
-JSONAbleABCEncodedType = TypeVar('JSONAbleABCEncodedType', bound=JSONSupportedTypes)
 
-
-class JSONAbleABC(Generic[JSONAbleABCEncodedType]):
+class JSONAbleABC:
     @classmethod
     def __jsonable_hash__(cls) -> str | None:
         """
@@ -35,7 +33,7 @@ class JSONAbleABC(Generic[JSONAbleABCEncodedType]):
         return
 
     @classmethod
-    def __jsonable_encode__(cls, obj: Self) -> JSONAbleABCEncodedType:
+    def __jsonable_encode__(cls, obj: Self) -> JSONSupportedTypes:
         """
         Encode to json, return native jsonable type
         :parma obj: Any Python object you want to encode
@@ -44,7 +42,7 @@ class JSONAbleABC(Generic[JSONAbleABCEncodedType]):
         raise NotImplemented
 
     @classmethod
-    def __jsonable_decode__(cls, data: JSONAbleABCEncodedType) -> Self:
+    def __jsonable_decode__(cls, data: JSONSupportedTypes) -> Self:
         """
         Decode from json, return any Python object
         :param data: The data of the object, as same as the return of function `__jsonable_encode__`

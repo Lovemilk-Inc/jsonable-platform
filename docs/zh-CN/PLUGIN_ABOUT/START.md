@@ -74,10 +74,12 @@ build-backend = "poetry.core.masonry.api"
 修改上述文件, 填写相关信息, 保存后即可完成 初始化 的全部流程了
 > 上述文件 `tool.poetry.authors` 字段 `Your Name` 代表您的用户名, 空格隔开用尖括号包裹的为您的邮箱, 格式如下 `<name@example.com>`, 两边尖括号不可省去
 
+更多 关于 `pyproject.toml` 的详细内容, 请参阅 [The pyproject.toml file | Documentation | Poetry - Python dependency management and packaging made easy](https://python-poetry.org/docs/pyproject) 
+
 ### 下一步, [开始编写插件](CODING_NOW.md)
 
 ## 注解
-[^dmca]: <https://www.dmca.com/> 或 <https://zh.wikipedia.org/wiki/%E6%95%B8%E5%AD%97%E5%8D%83%E5%B9%B4%E7%89%88%E6%AC%8A%E6%B3%95>
+[^dmca]: <https://www.dmca.com/> 或 <https://zh.wikipedia.org/wiki/数字千年版权法>
 [^md]: <https://zh.wikipedia.org/wiki/Markdown>
 
 ## 参考资料

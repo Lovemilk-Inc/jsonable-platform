@@ -8,20 +8,20 @@
     * 下面是示例 (以 datetime 为例)
 ```python
 from datetime import datetime as std_datetime
-from jsonable_platform import JSONAbleABC, Self, JSONAbleABCEncodedType, register
-  
+from jsonable_platform import JSONAbleABC, Self, JSONSupportedTypes, register
+
 # 继承 JSONAbleABC 和原始的 datetime, `JSONAbleABC[<type>]` `type` 同时代表了 `__jsonable_encode__` 返回值 和 `__jsonable_decode__` 参数 `obj` 的类型
-class datetime(std_datetime, JSONAbleABC[float]):
+class datetime(std_datetime, JSONAbleABC):
     # 实现类方法 __jsonable_encode__, 返回一个可转为 JSON 的 Python 基本类型 或 jsonable 类 实例化后的对象
     # 此处实际返回 float 
     @classmethod
-    def __jsonable_encode__(cls, obj: Self) -> JSONAbleABCEncodedType:
+    def __jsonable_encode__(cls, obj: Self) -> JSONSupportedTypes:
         return obj.timestamp()
         
     # 实现类方法 __jsonable_decode__, 将转换后的 float 重新转回 Python 的 datetime 对象
     # 此处返回 jsonable 的 datetime 对象 
     @classmethod
-    def __jsonable_decode__(cls, data: JSONAbleABCEncodedType) -> Self:
+    def __jsonable_decode__(cls, data: JSONSupportedTypes) -> Self:
         return cls.fromtimestamp(data)
     
 register(datetime)  # 将 datetime 注册到转换器中, 以便自动查找并转换

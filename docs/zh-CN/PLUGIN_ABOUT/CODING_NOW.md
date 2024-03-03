@@ -16,27 +16,27 @@
 (该插件实现了 内置 `datetime.datetime` 和 `datetime.timedelta` 的 Jsonable 类)
 
 ```python
-from jsonable_platform import JSONAbleABC, Self, register, JSONAbleABCEncodedType
+from jsonable_platform import JSONAbleABC, Self, register, JSONSupportedTypes
 from datetime import datetime as std_datetime, timedelta as std_timedelta
 
 
-class datetime(std_datetime, JSONAbleABC[float]):
+class datetime(std_datetime, JSONAbleABC):
     @classmethod
-    def __jsonable_encode__(cls, obj: Self) -> JSONAbleABCEncodedType:
+    def __jsonable_encode__(cls, obj: Self) -> JSONSupportedTypes:
         return obj.timestamp()
 
     @classmethod
-    def __jsonable_decode__(cls, data: JSONAbleABCEncodedType) -> Self:
+    def __jsonable_decode__(cls, data: JSONSupportedTypes) -> Self:
         return cls.fromtimestamp(data)
 
 
-class timedelta(std_timedelta, JSONAbleABC[float]):
+class timedelta(std_timedelta, JSONAbleABC):
     @classmethod
-    def __jsonable_encode__(cls, obj: Self) -> JSONAbleABCEncodedType:
+    def __jsonable_encode__(cls, obj: Self) -> JSONSupportedTypes:
         return obj.total_seconds()
 
     @classmethod
-    def __jsonable_decode__(cls, obj: JSONAbleABCEncodedType) -> Self:
+    def __jsonable_decode__(cls, obj: JSONSupportedTypes) -> Self:
         return cls(seconds=obj)
 
 
@@ -45,11 +45,11 @@ register(timedelta)
 ```
 
 ### 一般插件
-一般的, 您只需在 `__init__.py` 引入 `jsonable-platform` 库 的 `JSONAbleABC, Self, register, JSONAbleABCEncodedType`, 然后引入 您想要实现 jsonable 的类 (以下简称 "标准类")并同时继承 `JSONAbleABC` 和 标准类 并实现 `JSONAbleABC` 相关方法即可 
+一般的, 您只需在 `__init__.py` 引入 `jsonable-platform` 库 的 `JSONAbleABC, Self, register, JSONSupportedTypes`, 然后引入 您想要实现 jsonable 的类 (以下简称 "标准类")并同时继承 `JSONAbleABC` 和 标准类 并实现 `JSONAbleABC` 相关方法即可 
 
 例如, 如果您想要实现 `datetime.datetime` 的 jsonable
 
-第一步, 引入与继承
+#### 1. 引入与继承
 
 引入相关库和类型
 ```python
@@ -60,21 +60,21 @@ class MyDatetime(datetime, JSONAbleABC):
     ...
 ```
 
-第二步, 类方法与实现
+#### 2. 类方法与实现
 
 您可以使用任何方式序列化反序列化, 在这里, 我将 使用 float 型 时间戳
 ```python
 from datetime import datetime
-from jsonable_platform import JSONAbleABC, Self, JSONAbleABCEncodedType  # 引入类型
+from jsonable_platform import JSONAbleABC, Self, JSONSupportedTypes  # 引入类型
 
 
 class MyDatetime(datetime, JSONAbleABC):
     @classmethod
-    def __jsonable_encode__(cls, obj: Self) -> JSONAbleABCEncodedType:
+    def __jsonable_encode__(cls, obj: Self) -> JSONSupportedTypes:
         return obj.timestamp()  # 返回时间戳, 下面的 `__jsonable_decode__` 会收到这个时间戳
     
     @classmethod
-    def __jsonable_decode__(cls, data: JSONAbleABCEncodedType) -> Self:
+    def __jsonable_decode__(cls, data: JSONSupportedTypes) -> Self:
         # 这里的 data 就是上面的 `__jsonable_encode__` 返回的 timestamp
         return cls.fromtimestamp(data)
     
@@ -105,7 +105,7 @@ class MyDatetime(datetime, JSONAbleABC):
 
     * 返回: 如果返回 `None` (`JSONAbleABC` 默认返回), 则使用 类名 (`cls.__name__`) 作为 hash, 否则, 使用 该函数返回值, 且返回值必须为 `str`
 
-最后, 将类注册到 `jsonable-platform`, 以便自动搜索并编解码
+#### 3. 将类注册到 `jsonable-platform`, 以便自动搜索并编解码
 
 ```python
 register(MyDatetime)  # 注册类
@@ -124,8 +124,7 @@ register(<cls>, <requirement01>, <requirements02>, ...)
 
 这样, 您就可以使您的类优先在依赖项 (`requirements`) 中搜索并编解码, 而不会受到 外部重名 或 重 hash 类 的影响
 
-## 注解
-
+### 下一步, [发布插件](PUBLISH.md)
 
 ## 参考资料
 1. <https://koishi.chat/zh-CN/guide/plugin/>
