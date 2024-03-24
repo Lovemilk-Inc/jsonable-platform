@@ -172,6 +172,7 @@ def loads(s: str, fallback: DecoderFallbackType = None, **kwargs):
 
 
 def dump(obj: Any, fp: 'SupportsWrite[str]', fallback: EncoderFallbackType = None, **kwargs):
+    kwargs.setdefault('ensure_ascii', False)
     kwargs.pop('default', None)
 
     std_dump(obj, fp, default=lambda _obj: jsonable_encoder(_obj, fallback), **kwargs)

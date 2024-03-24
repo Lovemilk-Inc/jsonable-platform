@@ -11,7 +11,7 @@ ENCODER = JSONEncoder()
 
 def json_native_encode(obj: Any) -> str | None:
     """
-    Get the result of native json encoded, if obj can't be converted to json, return empty (...)
+    Get the result of native json encoded, if obj can't be converted to json, return None
     :param obj: Object you want to check
     :return: str -> native jsonable; None -> not native jsonable;
     """
