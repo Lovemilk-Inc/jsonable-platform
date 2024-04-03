@@ -5,9 +5,9 @@ from jsonable_platform import (
     dumps,
     register,
     JSONAbleABC,
-    JSONAbleABCEncodedType,
     Self,
-    loads
+    loads,
+    JSONSupportedTypes
 )
 
 
@@ -16,11 +16,11 @@ class Test(JSONAbleABC):
         self.content = content
 
     @classmethod
-    def __jsonable_encode__(cls, obj: Self) -> JSONAbleABCEncodedType:
+    def __jsonable_encode__(cls, obj: Self) -> JSONSupportedTypes:
         return {'content': obj.content}
 
     @classmethod
-    def __jsonable_decode__(cls, obj: JSONAbleABCEncodedType) -> Self:
+    def __jsonable_decode__(cls, obj: JSONSupportedTypes) -> Self:
         return cls(obj['content'])
 
     def __eq__(self, other):
@@ -43,11 +43,11 @@ class RecursionTest(JSONAbleABC):
         self.recursion_test = recursion_test
 
     @classmethod
-    def __jsonable_encode__(cls, obj: Self) -> JSONAbleABCEncodedType:
+    def __jsonable_encode__(cls, obj: Self) -> JSONSupportedTypes:
         return {'recursion_test': obj.recursion_test}
 
     @classmethod
-    def __jsonable_decode__(cls, data: JSONAbleABCEncodedType) -> Self:
+    def __jsonable_decode__(cls, data: JSONSupportedTypes) -> Self:
         return cls(data['recursion_test'])
 
     def __eq__(self, other):

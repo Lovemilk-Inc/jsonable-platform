@@ -14,21 +14,21 @@ Pypi Token 用于账户验证, 以便 依赖管理和打包工具 以您的身�
 打开 <https://pypi.org> 登录您的账户 (若无, 应当自行注册, 请参阅 [发布插件](#发布插件))
 
 #### 2. 新建 Pypi Token
-登录完成后, 单击右上方您的用户名以打开下拉菜单, 并单击 `Account Settings` 跳转至账户管理页面 (如下图)<br>
-*(或直接打开 <https://pypi.org/manage/account/>)*
+登录完成后, 单击右上方您的用户名以打开下拉菜单, 并单击 `Account Settings` 跳转至账户管理页面 (如下图) <br>
+*(或直接打开 <https://pypi.org/manage/account/>)* <br>   
 ![pypi-account-settings](res/images/pypi-account-settings.png)
 
-向下滚动滚轮或拖动滑条, 找到 `API tokens` 设置板块 (如下图)
+向下滚动滚轮或拖动滑条, 找到 `API tokens` 设置板块 (如下图) <br>
 ![pypi-account-settings-api-tokens](res/images/pypi-account-settings-api-tokens.png)
 
-单击上方蓝色的 `Add API token` 按钮, 跳转至 创建 API token (`Create API token`) 页面 (如下图)
+单击上方蓝色的 `Add API token` 按钮, 跳转至 创建 API token (`Create API token`) 页面 (如下图) <br>
 ![pypi-create-api-token](res/images/pypi-create-api-token.png)
 
 其中, `Token name` (必填) 字段 代表了您的 Pypi Token 的名称, 应当符合其作用, 或您自己能够理解 <br>
-`Scope` (必选) 选择框代表了该 token 的 作用范围, 一般情况下, 由于您未在 Pypi 发过 本包, 故只能选择 账户所有权 (所有项目) (`Entire account (all projects)`), 如下图所示
+`Scope` (必选) 选择框代表了该 token 的 作用范围, 一般情况下, 由于您未在 Pypi 发过 本包, 故只能选择 账户所有权 (所有项目) (`Entire account (all projects)`), 如下图所示 <br>
 ![pypi-create-api-token-scopes](res/images/pypi-create-api-token-scopes.png)
 
-最后, 单击蓝色 `Create token` 按钮即可创建 Token, 您需要将其复制下来, 并妥善保管
+最后, 单击蓝色 `Create token` 按钮即可创建 Token. 您需要将其复制下来, 并妥善保管
 
 ### 配置 依赖管理和打包工具 (`Poetry`)
 打开项目所在 Python 环境, 然后运行如下指令:
@@ -39,7 +39,7 @@ poetry config pypi-token.pypi <token>
 
 ### 构建, 发布 与 更改版本号
 #### 构建
-作为一个 Python 包, 在上传至 Pypi 前需要构建
+作为一个 Python 包, 在上传至 Pypi 前需要构建. <br>
 一般的, 运行如下命令即可完成构建
 ```shell
 poetry build
@@ -66,7 +66,7 @@ poetry version <版本号>
 ```
 其中, `版本号` 一般应当为 三个整数以 `.` 分割, 如 `1.2.3` <br>
 在版本号中, `1` 被叫做 大版本 (`major`), `2` 被叫做 中版本 (`minor`), `3` 被叫做 小版本 (`patch`) <br>
-一般规定, 大版本为 `0` 的为 `beta` 版本
+一般规定, 大版本为 `0` 的为 `beta` 版本[^versionOfBeta]
 
 更多 `poetry version` 的详细用法, 请参阅 [Commands | Documentation | Poetry - Python dependency management and packaging made easy](https://python-poetry.org/docs/cli/#version)
 
@@ -75,3 +75,4 @@ poetry version <版本号>
 2. <https://koishi.chat/zh-CN/guide/develop/publish.html#更新插件版本>
 
 [^2fa]: <https://blog.pypi.org/posts/2023-05-25-securing-pypi-with-2fa/>
+[^versionOfBeta]: <https://zh.wikipedia.org/wiki/軟件版本週期#Beta>

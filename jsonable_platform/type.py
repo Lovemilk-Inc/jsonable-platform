@@ -78,7 +78,7 @@ class RequiredEncodedDict(JSONAbleEncodedDict):
     parent: str
 
 
-JSONAbleEncodedType = Union[JSONAbleABCEncodedType, RequiredEncodedDict]
+JSONAbleEncodedType = Union[JSONSupportedTypes, RequiredEncodedDict]
 
 HashMethods = Literal['default', 'custom']
 EncoderFallbackType = Callable[[Any], JSONAbleEncodedDict]

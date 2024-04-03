@@ -1,4 +1,4 @@
-from jsonable_platform import register, JSONAbleABC, Self, JSONAbleABCEncodedType, loads, dumps
+from jsonable_platform import register, JSONAbleABC, Self, JSONSupportedTypes, loads, dumps
 
 
 class RequirementC(JSONAbleABC):
@@ -9,11 +9,11 @@ class RequirementC(JSONAbleABC):
         return f'RequirementC({self.content=})'
 
     @classmethod
-    def __jsonable_encode__(cls, obj: Self) -> JSONAbleABCEncodedType:
+    def __jsonable_encode__(cls, obj: Self) -> JSONSupportedTypes:
         return obj.content
 
     @classmethod
-    def __jsonable_decode__(cls, data: JSONAbleABCEncodedType) -> Self:
+    def __jsonable_decode__(cls, data: JSONSupportedTypes) -> Self:
         self = cls()
         self.content = data
         return self
@@ -28,11 +28,11 @@ class RequirementB(JSONAbleABC):
         return f'RequirementB({self.content=}, {self.datas=})'
 
     @classmethod
-    def __jsonable_encode__(cls, obj: Self) -> JSONAbleABCEncodedType:
+    def __jsonable_encode__(cls, obj: Self) -> JSONSupportedTypes:
         return [obj.content, obj.datas]
 
     @classmethod
-    def __jsonable_decode__(cls, data: JSONAbleABCEncodedType) -> Self:
+    def __jsonable_decode__(cls, data: JSONSupportedTypes) -> Self:
         self = cls()
         self.content = data[0]
         self.datas = data[1]
@@ -47,11 +47,11 @@ class RequirementA(JSONAbleABC):
         return f'RequirementA({self.information=})'
 
     @classmethod
-    def __jsonable_encode__(cls, obj: Self) -> JSONAbleABCEncodedType:
+    def __jsonable_encode__(cls, obj: Self) -> JSONSupportedTypes:
         return obj.information
 
     @classmethod
-    def __jsonable_decode__(cls, data: JSONAbleABCEncodedType) -> Self:
+    def __jsonable_decode__(cls, data: JSONSupportedTypes) -> Self:
         self = cls()
         self.information = data
         return self

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "jsonable-platform"
-version = "0.0.4.20240324122753"
+version = "0.0.4.20240324123217"
 description = "Customizing convert to JSON from the objects you defined for Python 3+"
 authors = ["lovemilk <zhuhansan666@outlook.com>"]
 license = "BSD-3-Clause"
