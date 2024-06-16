@@ -34,7 +34,7 @@ poetry new <项目名称>
 ├── <包名>
 │   └── __init__.py
 └── tests
-    └── __init__.p
+    └── __init__.py
 ```
 (参考: <https://python-poetry.org/docs/basic-usage/>)
 > 如果您不知道文件有什么作用, 请不要随意修改
